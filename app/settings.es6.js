@@ -1,9 +1,9 @@
-const config = {
-    board: {
+const settings = {
+    map: {
         width: 800,
         height: 600
     },
-    renderer: 'CANVAS',
+    renderer: 'CANVAS'.toUpperCase(),
     container: '',
     defaultState: null,
     transparent: false,
@@ -11,4 +11,4 @@ const config = {
     phisicsConfig: null
 };
 
-export default config;
+export default settings;

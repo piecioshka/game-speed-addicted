@@ -1,15 +1,29 @@
 'use strict';
 
-import CONFIG from './config.es6';
+import SETTINGS from './settings.es6';
+import Boot from './states/boot.es6';
 
-let game = new Phaser.Game(
-    CONFIG.board.width,
-    CONFIG.board.height,
-    Phaser[CONFIG.renderer.toUpperCase()], // renderer
-    CONFIG.container, // parent
-    CONFIG.defaultState, // state default
-    CONFIG.transparent, // transparent
-    CONFIG.antialias, // antyalias
-    CONFIG.phisicsConfig // physics configuration
+let Racer = window.Racer || {};
+
+Racer.settings = SETTINGS;
+Racer.game = new Phaser.Game(
+    SETTINGS.map.width,
+    SETTINGS.map.height,
+    Phaser[SETTINGS.renderer], // renderer
+    SETTINGS.container, // parent
+    SETTINGS.defaultState, // state default
+    SETTINGS.transparent, // transparent
+    SETTINGS.antialias, // antyalias
+    SETTINGS.phisicsConfig // physics configuration
 );
 
+Racer.states = {
+    Boot
+};
+
+Racer.game.state.add('boot', Racer.states.Boot);
+
+// Start game.
+Racer.game.state.start('boot');
+
+export default Racer;
