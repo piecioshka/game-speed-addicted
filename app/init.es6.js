@@ -2,6 +2,7 @@
 
 import SETTINGS from './settings.es6';
 import Menu from './states/menu.es6';
+import Race from './states/race.es6';
 
 let Racer = window.Racer || {};
 
@@ -17,11 +18,8 @@ Racer.game = new Phaser.Game(
     SETTINGS.phisicsConfig // physics configuration
 );
 
-Racer.states = {
-    Menu
-};
-
-Racer.game.state.add('Menu', Racer.states.Menu);
+Racer.game.state.add('Menu', Menu);
+Racer.game.state.add('Race', Race);
 
 // Start game.
 Racer.game.state.start('Menu');
