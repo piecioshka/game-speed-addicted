@@ -12,6 +12,7 @@ class Race extends Phaser.State {
     create() {
 
         this.speed = SETTINGS.game.initialSpeed;
+        this.carSwing = 20;
 
         let calcLeftPlayer = (SETTINGS.map.width / 2);
         let calcTopPlayer = (SETTINGS.map.height - this.game.cache.getImage('player').height) - 50;
@@ -97,9 +98,11 @@ class Race extends Phaser.State {
 
         if (keyboard.isDown(Phaser.Keyboard.LEFT)) {
             this.player.x -= moveOffset;
+            this.player.angle = -1 * this.carSwing;
 
         } else if (keyboard.isDown(Phaser.Keyboard.RIGHT)) {
             this.player.x += moveOffset;
+            this.player.angle = this.carSwing;
         }
 
         if (keyboard.isDown(Phaser.Keyboard.UP)) {
@@ -111,8 +114,16 @@ class Race extends Phaser.State {
 
             this.decrementSpeed(2);
             this.player.y += moveOffset / SETTINGS.game.divider;
-
         }
+
+        keyboard.onUpCallback = ((e) => {
+            let isLeft = (e.keyCode == Phaser.Keyboard.LEFT);
+            let isRight = (e.keyCode == Phaser.Keyboard.RIGHT);
+
+            if (isLeft || isRight ) {
+                this.player.angle = 0;
+            }
+        });
     }
 }
 
