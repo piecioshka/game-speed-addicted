@@ -9,4 +9,6 @@ require('phaser');
 // Initialize
 (function () {
     // Application code
+
+    require('app/init')
 })();
