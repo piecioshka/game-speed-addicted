@@ -1,3 +1,14 @@
-/**
- * Created by rgierczak on 2015-08-22.
- */
+'use strict';
+
+class Boot extends Phaser.State {
+
+    preload() {
+
+    }
+
+    create() {
+        this.game.stage.backgroundColor = '#c6c6c6';
+    }
+}
+
+export default Boot;
