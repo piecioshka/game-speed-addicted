@@ -1,7 +1,7 @@
 'use strict';
 
 import SETTINGS from './settings.es6';
-import Boot from './states/boot.es6';
+import Menu from './states/menu.es6';
 
 let Racer = window.Racer || {};
 
@@ -18,12 +18,12 @@ Racer.game = new Phaser.Game(
 );
 
 Racer.states = {
-    Boot
+    Menu
 };
 
-Racer.game.state.add('boot', Racer.states.Boot);
+Racer.game.state.add('Menu', Racer.states.Menu);
 
 // Start game.
-Racer.game.state.start('boot');
+Racer.game.state.start('Menu');
 
 export default Racer;
