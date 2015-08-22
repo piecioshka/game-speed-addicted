@@ -8,7 +8,7 @@ class Race extends Phaser.State {
     }
 
     create() {
-        console.log('race');
+        
     }
 
 }
