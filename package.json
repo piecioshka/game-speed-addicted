@@ -13,7 +13,6 @@
     "style-loader": "latest",
     "css-loader": "latest",
     "sass-loader": "latest",
-    "webpack": "latest",
-    "phaser": "latest"
+    "webpack": "latest"
   }
 }
