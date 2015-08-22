@@ -8,8 +8,13 @@ class Race extends Phaser.State {
     }
 
     create() {
+        // Bounds
+        Racer.game.world.setBounds(0, 0, SETTINGS.map.width, SETTINGS.map.height);
+
+        // Player
         this.player = this.game.add.sprite(128, 128, 'player');
         this.player.anchor.setTo(0.5, 0.5);
+        this.game.input.keyboard.createCursorKeys();
 
         // Set camera
         this.game.camera.follow(this.player);
@@ -22,7 +27,7 @@ class Race extends Phaser.State {
         this.player.body.velocity.setTo(0, 0);
         this.player.body.angularVelocity = 0;
 
-        let moveOffset = SETTINGS.map.tileSize / 2;
+        let moveOffset = 15;
         let keyboard = this.game.input.keyboard;
 
         if (keyboard.isDown(Phaser.Keyboard.LEFT)) {

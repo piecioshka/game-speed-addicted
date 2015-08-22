@@ -18,13 +18,6 @@ Racer.game = new Phaser.Game(
     SETTINGS.phisics // physics configuration
 );
 
-// Bounds
-Racer.game.world.setBounds(0, 0, SETTINGS.map.width, SETTINGS.map.height);
-
-// Player
-Racer.player = {};
-Racer.game.input.keyboard.createCursorKeys();
-
 // States
 Racer.game.state.add('Menu', Menu);
 Racer.game.state.add('Race', Race);
