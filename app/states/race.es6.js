@@ -7,11 +7,15 @@ class Race extends Phaser.State {
         this.game.load.image('player', '/app/assets/images/car.png');
         this.game.load.image('road', '/app/assets/images/road.jpg');
         this.game.load.image('grass', '/app/assets/images/grass.jpg');
+        this.game.load.image('powerup', '/app/assets/images/diamond.png');
     }
 
     create() {
+        this.game.physics.startSystem(Phaser.Physics[SETTINGS.physics]);
+        this.collideGroup = this.game.add.group();
 
         this.speed = SETTINGS.game.initialSpeed;
+        this.timer = 0;
         this.carSwing = 20;
 
         let calcLeftPlayer = (SETTINGS.map.width / 2);
@@ -19,9 +23,6 @@ class Race extends Phaser.State {
 
         // Bounds
         this.game.world.setBounds(0, 0, SETTINGS.map.width, SETTINGS.map.height);
-
-        // Set background image
-        //this.game.add.tileSprite(0, 0, SETTINGS.map.width,  SETTINGS.map.height, 'grass');
 
         // Set road image
         this.grass = this.grassSprite();
@@ -32,11 +33,14 @@ class Race extends Phaser.State {
         this.player.anchor.setTo(0.5, 0.5);
         this.game.input.keyboard.createCursorKeys();
 
+        this.game.physics.arcade.enableBody(this.player);
+        this.player.body.collideWorldBounds = true;
+
         // Set camera
         this.game.camera.follow(this.player);
-
-        // Set physics
         this.game.physics.enable(this.player, Phaser.Physics[SETTINGS.physics]);
+
+        this.powerup = this.createPowerUp();
     }
 
     getOffset(n, name) {
@@ -53,7 +57,6 @@ class Race extends Phaser.State {
         let width = this.game.cache.getImage(name).width;
         let height = SETTINGS.map.height + (SETTINGS.game.maxSpeed * 2);
 
-        console.debug(x, y, width, height, name);
         return this.game.add.tileSprite(x, y, width, height, name);
     }
 
@@ -63,37 +66,23 @@ class Race extends Phaser.State {
     }
 
     grassSprite() {
+        this.collideGroup.physicsBodyType = Phaser.Physics[SETTINGS.physics];
+        this.collideGroup.enableBody = true;
+
         this.grass1 = this.addTileSprite(-1, 'grass');
         this.grass2 = this.addTileSprite(0, 'grass');
+
+        this.collideGroup.add(this.grass1);
+        this.collideGroup.add(this.grass2);
     }
 
-    moveRoad(speed) {
-        let road2yPos = this.road2.y;
-        let road1yPos = this.road1.y;
-        let grass2yPos = this.grass2.y;
-        let grass1yPos = this.grass1.y;
-        let mapHeight = SETTINGS.map.height;
+    upToDown(spriteObj, callback) {
+        spriteObj.y += this.speed;
 
-        this.road1.y += speed;
-        this.road2.y += speed;
-
-        this.grass1.y += speed;
-        this.grass2.y += speed;
-
-        if (road2yPos >= mapHeight) {
-            this.road2.y = this.getOffset(-1, 'road');
-        }
-
-        if (road1yPos >= mapHeight) {
-            this.road1.y = this.getOffset(-1, 'road');
-        }
-
-        if (grass2yPos >= mapHeight) {
-            this.grass2.y = this.getOffset(-1, 'grass');
-        }
-
-        if (grass1yPos >= mapHeight) {
-            this.grass1.y = this.getOffset(-1, 'grass');
+        if (typeof callback === 'function') {
+            if (spriteObj.y >= SETTINGS.map.height) {
+                callback();
+            }
         }
     }
 
@@ -111,6 +100,10 @@ class Race extends Phaser.State {
         this.speed = (speed < minSpeed) ? minSpeed : speed;
     }
 
+    createPowerUp() {
+        return this.game.add.tileSprite(800, 0, 20, 20, 'powerup');
+    }
+
     update() {
         this.player.body.velocity.setTo(0, 0);
         this.player.body.angularVelocity = SETTINGS.game.angularVelocity;
@@ -118,7 +111,30 @@ class Race extends Phaser.State {
         let moveOffset = SETTINGS.game.moveOffset;
         let keyboard = this.game.input.keyboard;
 
-        this.moveRoad(this.speed);
+        this.upToDown(this.grass1, () => {
+            this.grass1.y = this.getOffset(-1, 'grass');
+        });
+
+        this.upToDown(this.grass2, () => {
+            this.grass2.y = this.getOffset(-1, 'grass');
+        });
+
+        this.upToDown(this.road1, () => {
+            this.road1.y = this.getOffset(-1, 'road');
+        });
+
+        this.upToDown(this.road2, () => {
+            this.road2.y = this.getOffset(-1, 'road');
+        });
+
+        if (this.powerup) {
+            this.upToDown(this.powerup, () => {
+                console.error('error');
+            });
+        }
+
+
+        this.timer++;
 
         if (keyboard.isDown(Phaser.Keyboard.LEFT)) {
             this.player.x -= moveOffset;
@@ -136,7 +152,7 @@ class Race extends Phaser.State {
 
         } else if (keyboard.isDown(Phaser.Keyboard.DOWN)) {
 
-            this.decrementSpeed(2);
+            this.decrementSpeed(20);
             this.player.y += moveOffset / SETTINGS.game.divider;
         }
 
@@ -147,6 +163,10 @@ class Race extends Phaser.State {
             if (isLeft || isRight ) {
                 this.player.angle = 0;
             }
+        });
+
+        this.game.physics.arcade.collide(this.player, this.collideGroup, () => {
+            console.log('kolizja');
         });
     }
 }
