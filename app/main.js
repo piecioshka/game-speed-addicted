@@ -6,6 +6,5 @@ require('./main.scss');
 // Initialize
 (function () {
     // Application code
-
-    require('app/init')
+    require('./init.es6');
 })();
