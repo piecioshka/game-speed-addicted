@@ -11,7 +11,7 @@ class Menu extends Phaser.State {
     create() {
         this.game.stage.backgroundColor = '#282828';
         this.game.add.sprite(0, 0, 'background');
-        let button = this.game.add.button(this.game.world.centerX - 120, 200, 'button', this.onClickHandler, this, 2, 1, 0);
+        let button = this.game.add.button(this.game.world.centerX - 120, 120, 'button', this.onClickHandler, this, 2, 1, 0);
     }
 
     onClickHandler() {
