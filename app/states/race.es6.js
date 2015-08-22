@@ -21,9 +21,10 @@ class Race extends Phaser.State {
         this.game.world.setBounds(0, 0, SETTINGS.map.width, SETTINGS.map.height);
 
         // Set background image
-        this.game.add.tileSprite(0, 0, SETTINGS.map.width,  SETTINGS.map.height, 'grass');
+        //this.game.add.tileSprite(0, 0, SETTINGS.map.width,  SETTINGS.map.height, 'grass');
 
         // Set road image
+        this.grass = this.grassSprite();
         this.road = this.roadSprite();
 
         // Player
@@ -38,38 +39,61 @@ class Race extends Phaser.State {
         this.game.physics.enable(this.player, Phaser.Physics[SETTINGS.physics]);
     }
 
-    getOffset(n) {
-        return this.game.cache.getImage('road').height * n;
+    getOffset(n, name) {
+        return this.game.cache.getImage(name).height * n;
     }
 
-    calcLeftOffset() {
-        return (SETTINGS.map.width - this.game.cache.getImage('road').width) / 2;
+    calcLeftOffset(name) {
+        return (SETTINGS.map.width - this.game.cache.getImage(name).width) / 2;
     }
 
-    addTileSprite(offset) {
-        return this.game.add.tileSprite(this.calcLeftOffset(), this.getOffset(offset),
-               this.game.cache.getImage('road').width, SETTINGS.map.height + (SETTINGS.game.maxSpeed * 2), 'road');
+    addTileSprite(offset, name) {
+        let x = this.calcLeftOffset(name);
+        let y = this.getOffset(offset, name);
+        let width = this.game.cache.getImage(name).width;
+        let height = SETTINGS.map.height + (SETTINGS.game.maxSpeed * 2);
+
+        console.debug(x, y, width, height, name);
+        return this.game.add.tileSprite(x, y, width, height, name);
     }
 
     roadSprite() {
-        this.road1 = this.addTileSprite(-1);
-        this.road2 = this.addTileSprite(0);
+        this.road1 = this.addTileSprite(-1, 'road');
+        this.road2 = this.addTileSprite(0, 'road');
+    }
+
+    grassSprite() {
+        this.grass1 = this.addTileSprite(-1, 'grass');
+        this.grass2 = this.addTileSprite(0, 'grass');
     }
 
     moveRoad(speed) {
         let road2yPos = this.road2.y;
         let road1yPos = this.road1.y;
+        let grass2yPos = this.grass2.y;
+        let grass1yPos = this.grass1.y;
         let mapHeight = SETTINGS.map.height;
 
         this.road1.y += speed;
         this.road2.y += speed;
 
+        this.grass1.y += speed;
+        this.grass2.y += speed;
+
         if (road2yPos >= mapHeight) {
-            this.road2.y = this.getOffset(-1);
+            this.road2.y = this.getOffset(-1, 'road');
         }
 
         if (road1yPos >= mapHeight) {
-            this.road1.y = this.getOffset(-1);
+            this.road1.y = this.getOffset(-1, 'road');
+        }
+
+        if (grass2yPos >= mapHeight) {
+            this.grass2.y = this.getOffset(-1, 'grass');
+        }
+
+        if (grass1yPos >= mapHeight) {
+            this.grass1.y = this.getOffset(-1, 'grass');
         }
     }
 
