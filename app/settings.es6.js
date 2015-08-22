@@ -9,6 +9,10 @@ const settings = {
     transparent: false,
     antialias: true,
     physics: 'arcade'.toUpperCase(),
+    game: {
+        angularVelocity: 0,
+        moveOffset: 15
+    }
 };
 
 export default settings;
