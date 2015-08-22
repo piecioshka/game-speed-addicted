@@ -3,19 +3,20 @@ const settings = {
         width: 1280,
         height: 800
     },
-    renderer: 'canvas'.toUpperCase(),
+    renderer: 'CANVAS',
     container: '',
     defaultState: null,
     transparent: false,
     antialias: true,
-    physics: 'arcade'.toUpperCase(),
+    physics: 'ARCADE',
     game: {
         angularVelocity: 0,
         moveOffset: 2,
         initialSpeed: 0,
         velocity: 0.02,
         maxSpeed: 50,
-        divider: 20
+        divider: 20,
+        points: 0
     }
 };
 

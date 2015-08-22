@@ -15,7 +15,7 @@ Racer.game = new Phaser.Game(
     SETTINGS.defaultState, // state default
     SETTINGS.transparent, // transparent
     SETTINGS.antialias, // antyalias
-    SETTINGS.phisics // physics configuration
+    SETTINGS.physics // physics configuration
 );
 
 // States
