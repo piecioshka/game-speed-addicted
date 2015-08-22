@@ -22,12 +22,6 @@ Racer.game = new Phaser.Game(
 Racer.game.state.add('Menu', Menu);
 Racer.game.state.add('Race', Race);
 
-Racer.game.stats = {
-    velocity: 0.2,
-    speed: 0,
-    maxSpeed: 100
-};
-
 // Start game.
 Racer.game.state.start('Menu');
 

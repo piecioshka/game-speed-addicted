@@ -11,7 +11,11 @@ const settings = {
     physics: 'arcade'.toUpperCase(),
     game: {
         angularVelocity: 0,
-        moveOffset: 15
+        moveOffset: 2,
+        initialSpeed: 0,
+        velocity: 0.02,
+        maxSpeed: 50,
+        divider: 20
     }
 };
 

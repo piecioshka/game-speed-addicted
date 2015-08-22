@@ -10,7 +10,8 @@ class Race extends Phaser.State {
     }
 
     create() {
-        console.log(this.game.stats);
+
+        this.speed = SETTINGS.game.initialSpeed;
 
         let calcLeftPlayer = (SETTINGS.map.width / 2);
         let calcTopPlayer = (SETTINGS.map.height - this.game.cache.getImage('player').height) - 50;
@@ -34,19 +35,55 @@ class Race extends Phaser.State {
 
         // Set physics
         this.game.physics.enable(this.player, Phaser.Physics[SETTINGS.physics]);
+    }
 
+    getOffset(n) {
+        return this.game.cache.getImage('road').height * n;
+    }
+
+    calcLeftOffset() {
+        return (SETTINGS.map.width - this.game.cache.getImage('road').width) / 2;
+    }
+
+    addTileSprite(offset) {
+        return this.game.add.tileSprite(this.calcLeftOffset(), this.getOffset(offset),
+               this.game.cache.getImage('road').width, SETTINGS.map.height + (SETTINGS.game.maxSpeed * 2), 'road');
     }
 
     roadSprite() {
-        let calcLeftOffset = (SETTINGS.map.width - this.game.cache.getImage('road').width) / 2;
+        this.road1 = this.addTileSprite(-1);
+        this.road2 = this.addTileSprite(0);
+    }
 
-        let getOffset = (n) => {
-            return this.game.cache.getImage('road').height * n;
-        };
+    moveRoad(speed) {
+        let road2yPos = this.road2.y;
+        let road1yPos = this.road1.y;
+        let mapHeight = SETTINGS.map.height;
 
-        this.game.add.tileSprite(calcLeftOffset, getOffset(-1), this.game.cache.getImage('road').width, SETTINGS.map.height, 'road');
-        this.game.add.tileSprite(calcLeftOffset, getOffset(0), this.game.cache.getImage('road').width, SETTINGS.map.height, 'road');
-        this.game.add.tileSprite(calcLeftOffset, getOffset(1), this.game.cache.getImage('road').width, SETTINGS.map.height, 'road');
+        this.road1.y += speed;
+        this.road2.y += speed;
+
+        if (road2yPos >= mapHeight) {
+            this.road2.y = this.getOffset(-1);
+        }
+
+        if (road1yPos >= mapHeight) {
+            this.road1.y = this.getOffset(-1);
+        }
+    }
+
+    incrementSpeed(n) {
+        let maxSpeed = SETTINGS.game.maxSpeed;
+        let speed = this.speed + (n * SETTINGS.game.velocity);
+
+        this.speed = (speed > maxSpeed) ? maxSpeed : speed;
+    }
+
+    decrementSpeed(n) {
+        let minSpeed = 0;
+        let speed = this.speed - (n * SETTINGS.game.velocity);
+
+        this.speed = (speed < minSpeed) ? minSpeed : speed;
     }
 
     update() {
@@ -55,7 +92,8 @@ class Race extends Phaser.State {
 
         let moveOffset = SETTINGS.game.moveOffset;
         let keyboard = this.game.input.keyboard;
-        let divider = 20;
+
+        this.moveRoad(this.speed);
 
         if (keyboard.isDown(Phaser.Keyboard.LEFT)) {
             this.player.x -= moveOffset;
@@ -65,15 +103,17 @@ class Race extends Phaser.State {
         }
 
         if (keyboard.isDown(Phaser.Keyboard.UP)) {
-            this.
-            this.player.y -= moveOffset / divider;
+
+            this.incrementSpeed(2);
+            this.player.y -= moveOffset / SETTINGS.game.divider;
 
         } else if (keyboard.isDown(Phaser.Keyboard.DOWN)) {
-            this.player.y += moveOffset / divider;
+
+            this.decrementSpeed(2);
+            this.player.y += moveOffset / SETTINGS.game.divider;
+
         }
     }
-
-
 }
 
 export default Race;
