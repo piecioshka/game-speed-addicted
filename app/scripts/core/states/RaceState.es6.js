@@ -18,33 +18,35 @@ let decrementSpeed = (speed, n) => {
 
 class RaceState extends Phaser.State {
     preload() {
+        this.speed = 0;
+        this.carSwing = 20;
+
         this.game.load.image('player', 'assets/images/car.png');
         this.game.load.image('road', 'assets/images/road.jpg');
         this.game.load.image('grass', 'assets/images/grass.jpg');
         this.game.load.image('powerup', 'assets/images/diamond.png');
-    }
-
-    create() {
-        this.speed = 0;
-        this.timer = 0;
-        this.carSwing = 20;
 
         // Bounds
         this.game.world.setBounds(0, 0, SETTINGS.map.width, SETTINGS.map.height);
+    }
 
-        // Start Physic System
-        this.game.physics.startSystem(Phaser.Physics[SETTINGS.physics]);
-
+    create() {
         // Setup road image
         this._setupGrassSprite();
         this._setupRoadSprite();
 
-        // Player
-        this.player = this._createPlayer();
+        let calcLeftPlayer = (SETTINGS.map.width / 1.6);
+        let calcTopPlayer = (SETTINGS.map.height - this.game.cache.getImage('player').height) - 50;
 
         // Diamonds
-        this.diamonds = this._createDiamondsGroup();
-        this.diamonds.add(this._createDiamond());
+        this.diamonds = this.game.add.group();
+        this.diamonds.enableBody = true;
+        this._createDiamond(this.diamonds, 800, 0);
+        this._createDiamond(this.diamonds, calcLeftPlayer, calcTopPlayer - 100);
+        this.game.physics.arcade.enable(this.diamonds);
+
+        // Player
+        this.player = this._createPlayer(calcLeftPlayer, calcTopPlayer);
 
         // Control
         this.game.input.keyboard.createCursorKeys();
@@ -60,40 +62,29 @@ class RaceState extends Phaser.State {
         this.grass2 = this._addTileSprite(0, 'grass');
     }
 
-    _createPlayer() {
-        let calcLeftPlayer = (SETTINGS.map.width / 2);
-        let calcTopPlayer = (SETTINGS.map.height - this.game.cache.getImage('player').height) - 50;
-
-        let player = this.game.add.sprite(calcLeftPlayer, calcTopPlayer, 'player');
+    _createPlayer(x, y) {
+        let player = this.game.add.sprite(x, y, 'player');
         player.anchor.setTo(0.5, 0.5);
 
-        this.game.physics.arcade.enableBody(player);
-        player.body.angularVelocity = SETTINGS.game.angularVelocity;
+        this.game.physics.arcade.enable(player);
+
         player.body.collideWorldBounds = true;
-        player.body.velocity.setTo(0, 0);
+        player.body.setSize(57, 94, 0, 0);
+
+        // player.body.angularVelocity = SETTINGS.game.angularVelocity;
+        // player.body.velocity.setTo(0, 0);
 
         return player;
     }
 
-    _createDiamondsGroup() {
-        let diamonds = this.game.add.group();
-        diamonds.enableBody = true;
-
-        diamonds.setAll('body.mass', 0.5);
-        diamonds.setAll('body.colliderWorldBounds', true);
-        diamonds.setAll('body.bounce', new Phaser.Point(0.5, 0.5));
-
-        return diamonds;
-    }
-
-    _createDiamond() {
-        let diamond = this.game.add.tileSprite(800, 0, 20, 20, 'powerup');
-        this.physics.arcade.enableBody(diamond);
-        return diamond;
+    _createDiamond(group, x, y) {
+        let diamond = this.game.add.tileSprite(x, y, 20, 20, 'powerup');
+        group.add(diamond);
+        this.physics.arcade.enable(diamond);
     }
 
     _getOffset(n, name) {
-        return this.game.cache.getImage(name).height * n;
+        return n * this.game.cache.getImage(name).height;
     }
 
     _calcLeftOffset(name) {
@@ -104,7 +95,7 @@ class RaceState extends Phaser.State {
         let x = this._calcLeftOffset(name);
         let y = this._getOffset(offset, name);
         let width = this.game.cache.getImage(name).width;
-        let height = SETTINGS.map.height + (SETTINGS.game.maxSpeed * 2);
+        let height = SETTINGS.map.height + (MAX_SPEED * 2);
 
         return this.game.add.tileSprite(x, y, width, height, name);
     }
@@ -122,16 +113,15 @@ class RaceState extends Phaser.State {
     }
 
     update() {
+        // console.log({ player: this.player, diamonds: this.diamonds });
+        // this.game.state.start('Menu');
+
         this._setupControl();
-        this.timer++;
-
-        return;
-
-        this.game.physics.arcade.collide(this.player, this.diamonds, function () {
-            console.log('Hit!');
-        });
-
         this._updateScreen();
+
+        this.game.physics.arcade.collide(this.player, this.diamonds, () => {
+            console.warn('HIT collideCallback');
+        });
     }
 
     _updateScreen() {
@@ -151,7 +141,11 @@ class RaceState extends Phaser.State {
             this.road2.y = this._getOffset(-1, 'road');
         });
 
-        this._upToDown(this.powerup);
+        // console.log('player', this.player.y);
+        this.diamonds.forEach(function (diamond) {
+            // console.log('diamond', diamond.y);
+            this._upToDown(diamond);
+        }, this)
     }
 
     _setupControl() {
@@ -167,20 +161,36 @@ class RaceState extends Phaser.State {
 
         if (keyboard.isDown(Phaser.Keyboard.UP)) {
             this.speed = incrementSpeed(this.speed, 20);
-            this.player.y -= MOVE_OFFSET;
         } else if (keyboard.isDown(Phaser.Keyboard.DOWN)) {
             this.speed = decrementSpeed(this.speed, 20);
-            this.player.y += MOVE_OFFSET;
         }
 
-        keyboard.onUpCallback = ((e) => {
+        keyboard.onUpCallback = (e) => {
             let isLeft = (e.keyCode == Phaser.Keyboard.LEFT);
             let isRight = (e.keyCode == Phaser.Keyboard.RIGHT);
 
             if (isLeft || isRight) {
                 this.player.angle = 0;
             }
-        });
+        };
+    }
+
+    render() {
+        this.game.debug.body(this.player);
+
+        this.diamonds.forEach((diamond) => {
+            this.game.debug.body(diamond);
+        }, this);
+
+        // ---------
+
+        this.game.debug.bodyInfo(this.player, 10, 50);
+
+        let index = 0;
+        this.diamonds.forEach((diamond) => {
+            this.game.debug.bodyInfo(diamond, 10, 100 + 150 * (index + 1));
+            index++;
+        }, this);
     }
 }
 

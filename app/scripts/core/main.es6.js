@@ -1,7 +1,7 @@
 'use strict';
 
 // Styles
-require('../assets/styles/main');
+require('../../assets/styles/main');
 
 import SETTINGS from './settings';
 import MenuState from './states/MenuState';

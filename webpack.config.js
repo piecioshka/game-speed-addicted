@@ -3,7 +3,7 @@ module.exports = {
         extensions: ['.scss', '.es6.js', '.js', '']
     },
 
-    entry: __dirname + '/app/scripts/main.es6.js',
+    entry: __dirname + '/app/scripts/core/main.es6.js',
 
     output: {
         path: __dirname + '/app/dist/',
