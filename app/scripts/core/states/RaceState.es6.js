@@ -19,12 +19,11 @@ let decrementSpeed = (speed, n) => {
 class RaceState extends Phaser.State {
     preload() {
         this.speed = 0;
-        this.carSwing = 20;
 
         this.game.load.image('player', 'assets/images/car.png');
         this.game.load.image('road', 'assets/images/road.jpg');
         this.game.load.image('grass', 'assets/images/grass.jpg');
-        this.game.load.image('powerup', 'assets/images/diamond.png');
+        this.game.load.image('diamond', 'assets/images/diamond.png');
 
         // Bounds
         this.game.world.setBounds(0, 0, SETTINGS.map.width, SETTINGS.map.height);
@@ -40,10 +39,10 @@ class RaceState extends Phaser.State {
 
         // Diamonds
         this.diamonds = this.game.add.group();
+        this.diamonds.add(this.game.add.sprite(800, 0, 'diamond'));
+        this.diamonds.add(this.game.add.sprite(calcLeftPlayer, calcTopPlayer - 100, 'diamond'));
         this.diamonds.enableBody = true;
-        this._createDiamond(this.diamonds, 800, 0);
-        this._createDiamond(this.diamonds, calcLeftPlayer, calcTopPlayer - 100);
-        this.game.physics.arcade.enable(this.diamonds);
+        this.game.physics.arcade.enable(this.diamonds, Phaser.Physics.ARCADE);
 
         // Player
         this.player = this._createPlayer(calcLeftPlayer, calcTopPlayer);
@@ -66,21 +65,16 @@ class RaceState extends Phaser.State {
         let player = this.game.add.sprite(x, y, 'player');
         player.anchor.setTo(0.5, 0.5);
 
-        this.game.physics.arcade.enable(player);
+        this.game.physics.arcade.enable(player, Phaser.Physics.ARCADE);
 
+        player.body.immovable = true;
         player.body.collideWorldBounds = true;
-        player.body.setSize(57, 94, 0, 0);
+        player.body.angularVelocity = SETTINGS.game.angularVelocity;
 
-        // player.body.angularVelocity = SETTINGS.game.angularVelocity;
-        // player.body.velocity.setTo(0, 0);
+        // UWAGA: To jest ta linijka, bez której nie będzie kolizji.
+        player.body.velocity.y = -100;
 
         return player;
-    }
-
-    _createDiamond(group, x, y) {
-        let diamond = this.game.add.tileSprite(x, y, 20, 20, 'powerup');
-        group.add(diamond);
-        this.physics.arcade.enable(diamond);
     }
 
     _getOffset(n, name) {
@@ -113,14 +107,12 @@ class RaceState extends Phaser.State {
     }
 
     update() {
-        // console.log({ player: this.player, diamonds: this.diamonds });
-        // this.game.state.start('Menu');
-
         this._setupControl();
         this._updateScreen();
 
-        this.game.physics.arcade.collide(this.player, this.diamonds, () => {
-            console.warn('HIT collideCallback');
+        this.game.physics.arcade.collide(this.player, this.diamonds, (car, item) => {
+            item.destroy();
+            console.info('Execute: collideCallback');
         });
     }
 
@@ -141,9 +133,7 @@ class RaceState extends Phaser.State {
             this.road2.y = this._getOffset(-1, 'road');
         });
 
-        // console.log('player', this.player.y);
         this.diamonds.forEach(function (diamond) {
-            // console.log('diamond', diamond.y);
             this._upToDown(diamond);
         }, this)
     }
@@ -153,10 +143,10 @@ class RaceState extends Phaser.State {
 
         if (keyboard.isDown(Phaser.Keyboard.LEFT)) {
             this.player.x -= MOVE_OFFSET;
-            this.player.angle = -1 * this.carSwing;
+            this.player.angle = -1 * SETTINGS.game.carSwing;
         } else if (keyboard.isDown(Phaser.Keyboard.RIGHT)) {
             this.player.x += MOVE_OFFSET;
-            this.player.angle = this.carSwing;
+            this.player.angle = SETTINGS.game.carSwing;
         }
 
         if (keyboard.isDown(Phaser.Keyboard.UP)) {
@@ -173,24 +163,6 @@ class RaceState extends Phaser.State {
                 this.player.angle = 0;
             }
         };
-    }
-
-    render() {
-        this.game.debug.body(this.player);
-
-        this.diamonds.forEach((diamond) => {
-            this.game.debug.body(diamond);
-        }, this);
-
-        // ---------
-
-        this.game.debug.bodyInfo(this.player, 10, 50);
-
-        let index = 0;
-        this.diamonds.forEach((diamond) => {
-            this.game.debug.bodyInfo(diamond, 10, 100 + 150 * (index + 1));
-            index++;
-        }, this);
     }
 }
 

@@ -13,7 +13,8 @@ const settings = {
         angularVelocity: 0,
         moveOffset: 2,
         velocity: 0.007,
-        maxSpeed: 50
+        maxSpeed: 50,
+        carSwing: 20
     }
 };
 
