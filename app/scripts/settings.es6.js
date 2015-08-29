@@ -12,10 +12,8 @@ const settings = {
     game: {
         angularVelocity: 0,
         moveOffset: 2,
-        initialSpeed: 0,
         velocity: 0.02,
-        maxSpeed: 50,
-        divider: 20,
+        maxSpeed: 100,
         points: 0
     }
 };

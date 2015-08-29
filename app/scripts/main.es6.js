@@ -1,10 +1,13 @@
 'use strict';
 
-import SETTINGS from './settings.es6';
-import Menu from './states/menu.es6';
-import Race from './states/race.es6';
+// Styles
+require('../assets/styles/main');
 
-let Racer = window.Racer || {};
+import SETTINGS from './settings';
+import MenuState from './states/MenuState';
+import RaceState from './states/RaceState';
+
+let Racer = {};
 
 Racer.settings = SETTINGS;
 Racer.game = new Phaser.Game(
@@ -19,10 +22,8 @@ Racer.game = new Phaser.Game(
 );
 
 // States
-Racer.game.state.add('Menu', Menu);
-Racer.game.state.add('Race', Race);
+Racer.game.state.add('Menu', MenuState);
+Racer.game.state.add('Race', RaceState);
 
 // Start game.
 Racer.game.state.start('Menu');
-
-export default Racer;

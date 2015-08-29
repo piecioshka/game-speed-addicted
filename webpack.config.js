@@ -1,13 +1,17 @@
 module.exports = {
-    entry: __dirname + '/app/main.js',
+    resolve: {
+        extensions: ['.scss', '.es6.js', '.js', '']
+    },
+
+    entry: __dirname + '/app/scripts/main.es6.js',
 
     output: {
-        path: __dirname + '/dist/',
+        path: __dirname + '/app/dist/',
         filename: 'bundle.js'
     },
 
     // http://webpack.github.io/docs/configuration.html#devtool
-    devtool: "#cheap-module-source-map",
+    // devtool: "#cheap-module-source-map",
 
     module: {
         loaders: [
@@ -20,10 +24,6 @@ module.exports = {
                 test: /\.scss$/,
                 exclude: /node_modules/,
                 loader: "style!css!sass"
-            },
-            {
-                test: /\.css$/,
-                loader: "style!css"
             },
             {
                 test: /\.(htm|html)$/,
