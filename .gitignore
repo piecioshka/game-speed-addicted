@@ -1,11 +1,11 @@
 # Ignore all logfiles and tempfiles.
-/log/*
+log/*
 !/log/.keep
-/tmp
+tmp
 
 # Ignore NodeJS modules
-/node_modules/
-/npm-debug.log
+node_modules/
+npm-debug.log
 
 # Ignore bundle files
-/app/dist/
+app/dist/
